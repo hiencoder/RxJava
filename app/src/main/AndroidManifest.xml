@@ -14,16 +14,19 @@
         <activity android:name=".operators.Example2Activity" />
         <activity android:name=".operators.DebounceOperatorActivity" />
         <activity android:name=".operators.Example3Activity" />
-        <activity android:name=".operators.Example4Activity"></activity>
-        <activity android:name=".operators.MapOperatorActivity">
+        <activity android:name=".operators.Example4Activity" />
+        <activity android:name=".operators.MapOperatorActivity"></activity>
+        <activity android:name=".operators.ConcatOperatorActivity">
+
+        </activity>
+        <activity android:name=".operators.FlatMapOperatorActivity"></activity>
+        <activity android:name=".SwitchMapOperatorActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".operators.ConcatOperatorActivity"></activity>
-        <activity android:name=".operators.FlatMapOperatorActivity"></activity>
     </application>
 
 </manifest>

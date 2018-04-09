@@ -2,6 +2,7 @@ package com.example.gmo.samplerectactive.operators;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.gmo.samplerectactive.R;
 import com.example.gmo.samplerectactive.operators.model.Address;
@@ -9,6 +10,7 @@ import com.example.gmo.samplerectactive.operators.model.People;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -26,6 +28,7 @@ public class FlatMapOperatorActivity extends AppCompatActivity {
     * Y/C: Tạo 1 Observable phát ra name, gender và address*/
     private static final String TAG = FlatMapOperatorActivity.class.getSimpleName();
     private Disposable disposable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,29 +49,45 @@ public class FlatMapOperatorActivity extends AppCompatActivity {
                 .subscribe(new Observer<People>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        Log.d(TAG, "onSubscribe: ");
+                        disposable = d;
                     }
 
                     @Override
                     public void onNext(People people) {
-
+                        Log.d(TAG, "onNext: " + people.getName() + ", Email: " + people.getEmail() + ", Address: " + people.getAddress().getAddress());
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.d(TAG, "onError: " + e.getMessage());
                     }
 
                     @Override
                     public void onComplete() {
-
+                        Log.d(TAG, "onComplete: ");
                     }
                 });
     }
 
     /*Lấy về thông tin address user*/
-    private ObservableSource<People> getAddressObservable(People people) {
-        return null;
+    private ObservableSource<People> getAddressObservable(final People people) {
+        /*Mang address*/
+        return Observable.create(new ObservableOnSubscribe<People>() {
+            @Override
+            public void subscribe(ObservableEmitter<People> emitter) throws Exception {
+                Address address = new Address();
+                address.setAddress((new Random().nextInt(100)) + " TDH, Hà Nội");
+                if (!emitter.isDisposed()){
+                    people.setAddress(address);
+                    //Thread sleep
+                    int sleepTime = new Random().nextInt(1000) + 500;
+                    Thread.sleep(sleepTime);
+                    emitter.onNext(people);
+                    emitter.onComplete();
+                }
+            }
+        });
     }
 
     /*Create Observable*/
@@ -92,11 +111,19 @@ public class FlatMapOperatorActivity extends AppCompatActivity {
 
     private List<People> preparePeople() {
         List<People> people = new ArrayList<>();
-        people.add(new People("Trump","Trump@gmail.com","Male",new Address("Mẽo")));
-        people.add(new People("Putin","Putin@gmail.com","Male",new Address("Liên Xô")));
-        people.add(new People("Tap","Tap@gmail.com","Female",new Address("Tàu")));
-        people.add(new People("Maochuxi","Mao@gmail.com","Male",new Address("Tàu")));
-        people.add(new People("KimUn","KimUn@gmail.com","Female",new Address("Triều Tiên")));
+        people.add(new People("Trump", "Trump@gmail.com", "Male", new Address("Mẽo")));
+        people.add(new People("Putin", "Putin@gmail.com", "Male", new Address("Liên Xô")));
+        people.add(new People("Tap", "Tap@gmail.com", "Female", new Address("Tàu")));
+        people.add(new People("Maochuxi", "Mao@gmail.com", "Male", new Address("Tàu")));
+        people.add(new People("KimUn", "KimUn@gmail.com", "Female", new Address("Triều Tiên")));
         return people;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (disposable != null && !disposable.isDisposed()){
+            disposable.dispose();
+        }
     }
 }
